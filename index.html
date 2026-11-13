@@ -72,7 +72,6 @@
             border: 1px solid #ccc;
         }
         
-        /* The generated image placeholder */
         #receipt-image {
             display: none;
             max-width: 100%;
@@ -94,7 +93,6 @@
         .flex-row { display: flex; justify-content: space-between; }
         .logo { max-width: 165px; filter: grayscale(100%) contrast(1.2); margin: 0 auto; display: block; }
         
-        /* Specific Entity adjustments */
         .text-10 { font-size: 10px; }
         .text-11 { font-size: 11px; }
         .text-12 { font-size: 12px; }
@@ -160,36 +158,40 @@
     </div>
 
     <div id="preview-panel">
-        <!-- The HTML version (Editable) -->
         <div id="receipt-container"></div>
-        
-        <!-- The PNG version (For Long-Press Saving) -->
         <img id="receipt-image" alt="Generated Receipt" />
         <div id="image-instruction">↑ Long-press the receipt above to Save to Photos or Share.</div>
     </div>
 </div>
 
-<!-- Load html2canvas at the end so it doesn't block the PIN screen from loading -->
+<!-- Load html2canvas -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
 <script>
-    // --- Security ---
     const correctPIN = "8775";
 
     function checkPIN() {
-        const input = document.getElementById('pin-input').value.trim();
+        const inputElem = document.getElementById('pin-input');
+        if (!inputElem) return;
+        
+        const input = inputElem.value.trim();
         if (input === correctPIN) {
             document.getElementById('pin-screen').style.display = 'none';
             document.getElementById('app-content').style.display = 'flex';
             generateReceipt();
         } else {
             alert("Incorrect PIN. Please try again.");
-            document.getElementById('pin-input').value = "";
+            inputElem.value = "";
         }
     }
 
-    // --- App Logic ---
-    document.getElementById('dateInput').valueAsDate = new Date();
+    // Initialize date safely on load
+    window.addEventListener('DOMContentLoaded', () => {
+        const dateInput = document.getElementById('dateInput');
+        if (dateInput) {
+            dateInput.valueAsDate = new Date();
+        }
+    });
 
     function generateRandomTime() {
         const h = Math.floor(Math.random() * (23 - 7 + 1)) + 7;
@@ -205,18 +207,33 @@
         let date = new Date();
         date.setHours(timeObj.h, timeObj.m, timeObj.s);
         date.setMinutes(date.getMinutes() - mins);
-        return `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}:${String(date.getSeconds()).padStart(2, '0')}`; }  function formatDateDDMMYYYY(dateStr) { const d = new Date(dateStr); return `${String(d.getDate()).padStart(2, '0')}-${String(d.getMonth()+1).padStart(2, '0')}-${d.getFullYear()}`;
+        return `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}:${String(date.getSeconds()).padStart(2, '0')}`;
+    }
+
+    function formatDateDDMMYYYY(dateStr) {
+        const d = new Date(dateStr);
+        return `${String(d.getDate()).padStart(2, '0')}-${String(d.getMonth()+1).padStart(2, '0')}-${d.getFullYear()}`;
     }
     
     function formatDateDDMMYY(dateStr) {
         const d = new Date(dateStr);
-        return `${String(d.getDate()).padStart(2, '0')}-${String(d.getMonth()+1).padStart(2, '0')}-${String(d.getFullYear()).slice(-2)}`; }  function formatHPDate(dateStr) { const d = new Date(dateStr); const months = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"]; return `${String(d.getDate()).padStart(2, '0')}-${months[d.getMonth()]}-${d.getFullYear()}`;
+        return `${String(d.getDate()).padStart(2, '0')}-${String(d.getMonth()+1).padStart(2, '0')}-${String(d.getFullYear()).slice(-2)}`;
+    }
+
+    function formatHPDate(dateStr) {
+        const d = new Date(dateStr);
+        const months = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
+        return `${String(d.getDate()).padStart(2, '0')}-${months[d.getMonth()]}-${d.getFullYear()}`;
     }
 
     function generateReceipt() {
-        document.getElementById('receipt-image').style.display = 'none';
-        document.getElementById('image-instruction').style.display = 'none';
-        document.getElementById('receipt-container').style.display = 'block';
+        const imgElem = document.getElementById('receipt-image');
+        const instructionElem = document.getElementById('image-instruction');
+        const containerElem = document.getElementById('receipt-container');
+        
+        if (imgElem) imgElem.style.display = 'none';
+        if (instructionElem) instructionElem.style.display = 'none';
+        if (containerElem) containerElem.style.display = 'block';
 
         const entity = document.getElementById('entitySelect').value;
         const amount = parseFloat(document.getElementById('amount').value).toFixed(2);
@@ -243,14 +260,14 @@
                     <div class="center bold">VIJAY AUTOMOBILES<br>MUMBAI PANVEL ROAD KALAMBOLI<br>NAVI MUMBAI</div>
                     <br>
                     <div class="nowrap">Attendant Name : Vijay Automobile P</div>
-                    <div class="flex-row"><span>DATE: ${ddMMyyyy}</span><span>TIME:${timeStr}</span></div>
+                    <div class="flex-row"><span>DATE: ${ddMMyyyy}</span><span>TIME: ${timeStr}</span></div>
                     <div class="flex-row mb-5"><span>MID: 470000050641539</span><span>TID: 39268123</span></div>
                     <div class="center bold text-12 mb-5">Sale</div>
                     <div class="flex-row"><span>Txn Type: ${payMode}</span></div>
                     <div class="flex-row"><span>Product :</span><span>${product}</span></div>
                     <div class="flex-row"><span>Txn Id :</span><span>${txnId}</span></div>
-                    <div class="flex-row"><span>Unit Price : ₹ ${unitPrice}</span><span>Quantity :${volume} Ltr</span></div>
-                    <div class="flex-row"><span>Pump No : ${pump}</span><span>Nozzle No :${nozzle}</span></div>
+                    <div class="flex-row"><span>Unit Price : ₹ ${unitPrice}</span><span>Quantity : ${volume} Ltr</span></div>
+                    <div class="flex-row"><span>Pump No : ${pump}</span><span>Nozzle No : ${nozzle}</span></div>
                     <div class="flex-row mb-5"><span>Total Sale</span><span>₹ ${amount}</span></div>
                     <div style="border-top: 1px dashed black; margin: 5px 0;"></div>
                     <div class="flex-row bold text-12 mb-5"><span>Net Amount</span><span>₹ ${amount}</span></div>
@@ -283,11 +300,4 @@
                 footer = `<div class="center mt-5">THANK YOU VISIT AGAIN</div>`;
             } else if (entity === 'bpkalamboli') {
                 address = `BP KALAMBOLI 2, BPCL, Mu<br>mbai Pune Raod, Mumbai-4<br>10208<br>CASH MEMO<br>B KALAMBOLI 2<br>VAT NO:27160318214V`;
-                bayNo = Math.floor(Math.random() * 8) + 1;
-                showPreset = true;
-                footer = `<div class="center mt-5">THANK YOU!! VISIST AGAIN<br>!!<br>Mission LiFE...........<br>. Environment Protection</div>`;
-            }
-
-            let presetHtml = showPreset ? `
-                <div class="flex-row"><span>PresetType:</span><span>Local Volume</span></div>
-                <div class="flex-row">
+                bayNo = Math.floor
