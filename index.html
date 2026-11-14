@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Receipt Generator</title>
+    <style>
+        body { font-family: sans-serif; background: #f0f0f0; margin: 0; padding: 20px; }
+        
+        /* PIN Screen */
+        #pin-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 80vh; }
+        #pin-screen div { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); text-align: center; }
+        #pin-screen input { padding: 10px; font-size: 18px; width: 150px; text-align: center; letter-spacing: 5px; margin: 15px 0; border: 1px solid #ccc; border-radius: 4px; }
+        #pin-screen button { background: #007bff; color: white; border: none; padding: 10px 20px; font-size: 16px; border-radius: 4px; cursor: pointer; }
+        #pin-screen button:hover { background: #0056b3; }
+
+        /* Main App */
+        #app-content { display: none; gap: 20px; flex-wrap: wrap; }
+        
+        #config-panel { background: white; padding: 20px; border-radius: 8px; width: 300px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        #config-panel h2 { margin-top: 0; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 14px; }
+        .form-group input, .form-group select { width: 100%; padding: 8px; box-sizing: border-box; }
+        .btn-print { width: 100%; padding: 10px; background: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; margin-top: 10px; font-weight: bold; }
+        
+        #preview-panel { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); display: flex; flex-direction: column; align-items: center; }
+        
+        /* Receipt Styles - Widened to 250px to prevent wrapping */
+        #receipt-container { width: 250px; background: white; color: black; font-family: 'Courier New', Courier, monospace; padding: 10px; box-sizing: border-box; margin: 0 auto; border: 1px solid #ccc; }
+        #receipt-image { display: none; max-width: 100%; margin: 0 auto; border: 1px solid #ccc; }
+        #image-instruction { display: none; text-align: center; color: #d9534f; font-weight: bold; margin-top: 15px; font-size: 14px; }
+        
+        .center { text-align: center; }
+        .bold { font-weight: bold; }
+        .flex-row { display: flex; justify-content: space-between; }
+        .logo { max-width: 165px; filter: grayscale(100%) contrast(1.2); margin: 0 auto; display: block; }
+        
+        .text-10 { font-size: 10px; }
+        .text-11 { font-size: 11px; }
+        .text-12 { font-size: 12px; }
+        
+        /* New condensed class for highly packed lines */
+        .condensed-row { font-size: 9px; letter-spacing: -0.5px; white-space: nowrap; }
+        
+        .nowrap { white-space: nowrap; }
+        .mb-5 { margin-bottom: 5px; }
+        .mt-5 { margin-top: 5px; }
+    </style>
+</head>
+<body>
+
+<!-- Security Front Door -->
+<div id="pin-screen">
+    <div>
+        <h2>Access Required</h2>
+        <p>Please enter your PIN.</p>
+        <input type="password" id="pin-input" placeholder="••••" onkeypress="if(event.key === 'Enter') checkPIN()">
+        <br>
+        <button type="button" onclick="checkPIN()">Unlock</button>
+    </div>
+</div>
+
+<!-- Receipt Application -->
+<div id="app-content">
+    <div id="config-panel">
+        <h2>Receipt Settings</h2>
+        <div class="form-group">
+            <label>Entity</label>
+            <select id="entitySelect" onchange="generateReceipt()">
+                <option value="vijay">1. Vijay Automobile</option>
+                <option value="bppl">2. BP PL</option>
+                <option value="bpeway">3. BP EWAY</option>
+                <option value="bpkalamboli">4. BP Kalamboli</option>
+                <option value="hpshirdhon" selected>5. HP Shirdhon</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Amount (Rs)</label>
+            <input type="number" id="amount" value="3608.68" step="0.01" oninput="generateReceipt()">
+        </div>
+        <div class="form-group">
+            <label>Unit Price (Rate)</label>
+            <input type="number" id="unitPrice" value="90.33" step="0.01" oninput="generateReceipt()">
+        </div>
+        <div class="form-group">
+            <label>Product</label>
+            <select id="product" onchange="generateReceipt()">
+                <option value="DIESEL">Diesel</option>
+                <option value="PETROL">Petrol</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Transaction Type</label>
+            <select id="txnType" onchange="generateReceipt()">
+                <option value="CREDIT CARD">Card</option>
+                <option value="CASH">Cash</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Date</label>
+            <input type="date" id="dateInput" onchange="generateReceipt()">
+        </div>
+        <button type="button" class="btn-print" onclick="convertToImage()">Generate Image to Save</button>
+    </div>
+
+    <div id="preview-panel">
+        <div id="receipt-container"></div>
+        <img id="receipt-image" alt="Generated Receipt" />
+        <div id="image-instruction">↑ Long-press the receipt above to Save to Photos or Share.</div>
+    </div>
+</div>
+
+<script>
+    // --- PIN LOGIC ---
+    function checkPIN() {
+        var input = document.getElementById('pin-input').value.trim();
+        if (input === "8775") {
+            document.getElementById('pin-screen').style.display = 'none';
+            document.getElementById('app-content').style.display = 'flex';
+            
+            document.getElementById('dateInput').valueAsDate = new Date();
+            generateReceipt();
+        } else {
+            alert("Incorrect PIN. Please try again.");
+            document.getElementById('pin-input').value = "";
+        }
+    }
+
+    // --- HELPER FUNCTIONS ---
+    function generateRandomTime() {
+        var h = Math.floor(Math.random() * (23 - 7 + 1)) + 7;
+        var m = Math.floor(Math.random() * 60);
+        var s = Math.floor(Math.random() * 60);
+        return {
+            h: h, m: m, s: s,
+            str: String(h).padStart(2, '0') + ':' + String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0')
+        };
+    }
+
+    function subtractMinutes(timeObj, mins) {
+        var date = new Date();
+        date.setHours(timeObj.h, timeObj.m, timeObj.s);
+        date.setMinutes(date.getMinutes() - mins);
+        return String(date.getHours()).padStart(2, '0') + ':' + String(date.getMinutes()).padStart(2, '0') + ':' + String(date.getSeconds()).padStart(2, '0');
+    }
+
+    function formatDateDDMMYYYY(dateStr) {
+        var d = new Date(dateStr);
+        return String(d.getDate()).padStart(2, '0') + '-' + String(d.getMonth()+1).padStart(2, '0') + '-' + d.getFullYear();
+    }
+    
+    function formatDateDDMMYY(dateStr) {
+        var d = new Date(dateStr);
+        return String(d.getDate()).padStart(2, '0') + '-' + String(d.getMonth()+1).padStart(2, '0') + '-' + String(d.getFullYear()).slice(-2);
+    }
+
+    function formatHPDate(dateStr) {
+        var d = new Date(dateStr);
+        var months = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
+        return String(d.getDate()).padStart(2, '0') + '-' + months[d.getMonth()] + '-' + d.getFullYear();
+    }
+
+    // --- CORE GENERATION LOGIC ---
+    function generateReceipt() {
+        var imgElem = document.getElementById('receipt-image');
+        var instructionElem = document.getElementById('image-instruction');
+        var containerElem = document.getElementById('receipt-container');
+        
+        if (imgElem) imgElem.style.display = 'none';
+        if (instructionElem) instructionElem.style.display = 'none';
+        if (containerElem) containerElem.style.display = 'block';
+
+        var entity = document.getElementById('entitySelect').value;
+        var amount = parseFloat(document.getElementById('amount').value).toFixed(2);
+        var unitPrice = parseFloat(document.getElementById('unitPrice').value).toFixed(2);
+        var product = document.getElementById('product').value.toUpperCase();
+        var payMode = document.getElementById('txnType').value;
+        var dateInput = document.getElementById('dateInput').value;
+        
+        var volume = (amount / unitPrice).toFixed(2);
+        var nozzle = Math.floor(Math.random() * 2) + 1;
+        var txnId = Math.floor(1000000000 + Math.random() * 9000000000); 
+
+        var timeObj = generateRandomTime();
+        var timeStr = timeObj.str;
+        var html = '';
+
+        if (entity === 'vijay') {
+            var pump = Math.floor(Math.random() * 20) + 1;
+            var ddMMyyyy = formatDateDDMMYYYY(dateInput);
+            html = '<div class="text-10"><img src="LogoHP.png" class="logo mb-5" alt="HP Logo"><div class="center bold">VIJAY AUTOMOBILES<br>MUMBAI PANVEL ROAD KALAMBOLI<br>NAVI MUMBAI</div><br><div class="nowrap">Attendant Name : Vijay Automobile P</div><div class="flex-row"><span>DATE: ' + ddMMyyyy + '</span><span>TIME: ' + timeStr + '</span></div><div class="flex-row mb-5 condensed-row"><span>MID: 470000050641539</span><span>TID: 39268123</span></div><div class="center bold text-12 mb-5">Sale</div><div class="flex-row"><span>Txn Type: ' + payMode + '</span></div><div class="flex-row"><span>Product :</span><span>' + product + '</span></div><div class="flex-row"><span>Txn Id :</span><span>' + txnId + '</span></div><div class="flex-row condensed-row"><span>Unit Price : ₹ ' + unitPrice + '</span><span>Quantity : ' + volume + ' Ltr</span></div><div class="flex-row condensed-row mb-5"><span>Pump No : ' + pump + '</span><span>Nozzle No : ' + nozzle + '</span></div><div class="flex-row"><span>Total Sale</span><span>₹ ' + amount + '</span></div><div style="border-top: 1px dashed black; margin: 5px 0;"></div><div class="flex-row bold text-12 mb-5"><span>Net Amount</span><span>₹ ' + amount + '</span></div><div style="border-top: 1px dashed black; margin: 5px 0;"></div><div class="center mt-5">Choose e-receipt to save paper and protect the environment<br><br>CUSTOMER COPY<br>Biller App: 1.0.27</div></div>';
+        } 
+        else if (entity === 'bppl' || entity === 'bpeway' || entity === 'bpkalamboli') {
+            var logo = 'LogoBPPL.png';
+            var address = '';
+            var bayNo = '';
+            var footer = '';
+            var showPreset = false;
+
+            var ddMMyyyy = formatDateDDMMYYYY(dateInput);
+            var ddMMyy = formatDateDDMMYY(dateInput);
+            var txSt = subtractMinutes(timeObj, 5);
+            var txEnd = subtractMinutes(timeObj, 2);
+
+            if (entity === 'bppl') {
+                address = 'BP-PANVEL 1, BPCL, SECTO<br>R 9 ROAD, PANVEL, Mumbai<br>-410206';
+                bayNo = Math.floor(Math.random() * 5) + 1;
+                showPreset = true;
+                footer = '<div class="center mt-5">THANK YOU<br>Mission LiFE...........<br>. Environment Protection</div>';
+            } else if (entity === 'bpeway') {
+                address = 'WELCOME TO BPCL<br>BP EXPRESSWAY<br>GST NO. 27AAACB2902312';
+                bayNo = Math.floor(Math.random() * 10) + 1;
+                showPreset = false;
+                footer = '<div class="center mt-5">THANK YOU VISIT AGAIN</div>';
+            } else if (entity === 'bpkalamboli') {
+                address = 'BP KALAMBOLI 2, BPCL, Mu<br>mbai Pune Raod, Mumbai-4<br>10208<br>CASH MEMO<br>B KALAMBOLI 2<br>VAT NO:27160318214V';
+                bayNo = Math.floor(Math.random() * 8) + 1;
+                showPreset = true;
+                footer = '<div class="center mt-5">THANK YOU!! VISIST AGAIN<br>!!<br>Mission LiFE...........<br>. Environment Protection</div>';
+            }
+
+            var presetHtml = showPreset ? '<div class="flex-row"><span>PresetType:</span><span>Local Volume</span></div><div class="flex-row"><span>Preset Value:</span><span>99.99</span></div>' : '';
+
+            html = '<div class="text-12"><img src="' + logo + '" class="logo mb-5" alt="BP Logo"><div class="center">' + address + '</div><div class="flex-row"><span>Date:</span><span>' + ddMMyyyy + '</span></div><div class="flex-row"><span>Time:</span><span>' + timeStr + '</span></div><div class="flex-row"><span>BayNo:</span><span>' + bayNo + '</span></div><div class="flex-row"><span>NozzleNo:</span><span>' + nozzle + '</span></div><div class="flex-row"><span>Product:</span><span>' + product + '</span></div><div class="flex-row"><span>PayMode:</span><span>' + payMode + '</span></div><div class="flex-row"><span>Txn Id:</span><span>' + txnId + '</span></div><div>Attendant:</div><div class="flex-row"><span>TxSt:</span><span>' + ddMMyy + ' ' + txSt + '</span></div><div class="flex-row"><span>TxEnd:</span><span>' + ddMMyy + ' ' + txEnd + '</span></div><div class="flex-row"><span>Rate/Ltr.:</span><span>' + unitPrice + '</span></div><div class="flex-row"><span>Volume(Ltr.):</span><span>' + volume + '</span></div><div class="flex-row"><span>Amount(Rs.):</span><span>' + amount + '</span></div>' + presetHtml + '<div>VechNo:</div><div>MobileNo:</div>' + footer + '</div>';
+        }
+        else if (entity === 'hpshirdhon') {
+            var hpDate = formatHPDate(dateInput);
+            var invoiceNo = Math.floor(10000 + Math.random() * 90000);
+            var productTitleCase = product.charAt(0).toUpperCase() + product.slice(1).toLowerCase();
+            
+            html = '<div class="text-11"><img src="LogoHP.png" class="logo mb-5" alt="HP Logo"><div class="center mb-5">SHRI GANESH HIGHWAY SERV<br>SHIRDHON, NH-66, PANVEL,<br>RAIGAD, MAHARASHTRA.<br>9867503325/8806580294<br>VAT NO-27800771919V<br>...<br>ORIGINAL</div><div class="center mb-5">************************</div><div class="flex-row mb-5"><span>' + hpDate + '</span><span>' + timeStr + '</span></div><div>TXN NO: ' + txnId + '</div><div>INVOICE NO: ' + invoiceNo + '</div><div>VEHICLE NO: NOT ENTERED</div><div>PRESET: NOT ENTERED</div><div class="center mb-5 mt-5">************************</div><div>NOZZLE NO : ' + nozzle + '</div><div>PRODUCT: ' + productTitleCase + '</div><div>RATE &nbsp;&nbsp;&nbsp;: ' + unitPrice + ' INR/Ltr</div><div>VOLUME: ' + volume + ' Ltr</div><div>AMOUNT: ' + amount + ' INR</div><div class="center mb-5 mt-5">************************</div><div class="center mt-5">Thank You! Visit Again</div></div>';
+        }
+
+        if (containerElem) containerElem.innerHTML = html;
+    }
+
+    // --- IMAGE CONVERSION LOGIC ---
+    function convertToImage() {
+        var receiptContainer = document.getElementById('receipt-container');
+        if (!receiptContainer) return;
+        
+        var originalBorder = receiptContainer.style.border;
+        receiptContainer.style.border = 'none';
+
+        if (typeof html2canvas === 'undefined') {
+            alert("Image generator is still loading. Please wait a second and try again.");
+            receiptContainer.style.border = originalBorder;
+            return;
+        }
+
+        html2canvas(receiptContainer, {
+            scale: 3, 
+            backgroundColor: "#ffffff",
+            useCORS: true
+        }).then(function(canvas) {
+            receiptContainer.style.border = originalBorder;
+            var imgData = canvas.toDataURL("image/png");
+            
+            var imgElement = document.getElementById('receipt-image');
+            var instructionElement = document.getElementById('image-instruction');
+            
+            if (imgElement) {
+                imgElement.src = imgData;
+                imgElement.style.display = 'block';
+            }
+            if (receiptContainer) receiptContainer.style.display = 'none';
+            if (instructionElement) instructionElement.style.display = 'block';
+            
+        }).catch(function(err) {
+            console.error("Error generating image: ", err);
+            receiptContainer.style.border = originalBorder;
+            alert("Could not generate image. Please take a manual screenshot.");
+        });
+    }
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+</body>
+</html>
