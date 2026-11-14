@@ -259,10 +259,20 @@
                 footerHtml = '<div class="text-center-wrap">Choose e-receipts to save paper<br>and protect the environment!<br><br>CUSTOMER COPY<br>BillerApp_1.1.4<img src="pinelabs.png" class="pinelabs-logo" alt="Pine Labs Logo"></div>';
             }
 
-            // FIXED FOR VIJAY:
-            // Txn Type, Product, and Txn Id are standard left aligned (standard-row).
-            // Unit Price and Quantity are split onto completely separate standard-row lines to NEVER touch or cramp.
-            html = '<div class="text-center-wrap bold text-12 mb-5"><img src="LogoHP.png" class="logo mb-5" alt="HP Logo">VIJAY AUTOMOBILES<br>MUMBAI PANVEL ROAD KALAMBOLI<br>NAVI MUMBAI</div><div class="standard-row mt-5">Attendant Name: ' + attendantName + '</div><div class="split-row"><span>DATE: ' + ddMMyyyy + '</span><span>TIME: ' + timeStr + '</span></div><div class="split-row mb-5"><span>MID: 470000050641539</span><span>TID: 39268123</span></div><div class="center bold text-12 mb-5 mt-5">Sale</div><div class="standard-row">Txn Type: ' + payMode + '</div><div class="standard-row">Product : ' + product + '</div><div class="standard-row">Txn Id  : ' + txnId + '</div><div class="standard-row">Unit Price: ₹ ' + unitPrice + '</div><div class="standard-row">Quantity  : ' + volume + ' Ltr</div><div class="split-row mt-5 mb-5"><span>Pump No : ' + pump + '</span><span>Nozzle No : ' + nozzle + '</span></div><div class="split-row"><span>Total Sale</span><span>₹ ' + amount + '</span></div><div class="dashed-line"></div><div class="split-row bold text-12 mb-5"><span>Net Amount</span><span>₹ ' + amount + '</span></div><div class="dashed-line"></div>' + footerHtml;
+            html = '<div class="text-center-wrap bold text-12 mb-5"><img src="LogoHP.png" class="logo mb-5" alt="HP Logo">VIJAY AUTOMOBILES<br>MUMBAI PANVEL ROAD KALAMBOLI<br>NAVI MUMBAI</div>' +
+                   '<div class="standard-row mt-5">Attendant Name: ' + attendantName + '</div>' +
+                   '<div class="split-row"><span>DATE: ' + ddMMyyyy + '</span><span>TIME: ' + timeStr + '</span></div>' +
+                   '<div class="split-row mb-5"><span>MID: 470000050641539</span><span>TID: 39268123</span></div>' +
+                   '<div class="center bold text-12 mb-5 mt-5">Sale</div>' +
+                   '<div class="standard-row">Txn Type: ' + payMode + '</div>' +
+                   '<div class="split-row"><span>Product :</span><span>' + product + '</span></div>' +
+                   '<div class="split-row"><span>Txn Id :</span><span>' + txnId + '</span></div>' +
+                   '<div class="split-row"><span>Unit Price: ₹ ' + unitPrice + '</span><span>Qty : ' + volume + ' Ltr</span></div>' +
+                   '<div class="split-row mb-5"><span>Pump No : ' + pump + '</span><span>Nozzle No : ' + nozzle + '</span></div>' +
+                   '<div class="split-row"><span>Total Sale</span><span>₹ ' + amount + '</span></div>' +
+                   '<div class="dashed-line"></div>' +
+                   '<div class="split-row bold text-12 mb-5"><span>Net Amount</span><span>₹ ' + amount + '</span></div>' +
+                   '<div class="dashed-line"></div>' + footerHtml;
         } 
         else if (entity === 'bppl' || entity === 'bpeway' || entity === 'bpkalamboli') {
             containerElem.className = 'style-bp';
@@ -299,8 +309,23 @@
 
             var presetHtml = showPreset ? '<div class="split-row"><span>PresetType:</span><span>Local Volume</span></div><div class="split-row"><span>Preset Value:</span><span>99.99</span></div>' : '';
 
-            // Using split-row for everything in BP to ensure the values are pushed to the absolute left and right
-            html = '<div class="text-center-wrap mb-5"><img src="' + logo + '" class="logo mb-5" alt="BP Logo">' + address + '</div><div class="split-row"><span>Date:</span><span>' + ddMMyyyy + '</span></div><div class="split-row"><span>Time:</span><span>' + timeStr + '</span></div><div class="split-row"><span>BayNo:</span><span>' + bayNo + '</span></div><div class="split-row"><span>NozzleNo:</span><span>' + nozzle + '</span></div><div class="split-row"><span>Product:</span><span>' + product + '</span></div><div class="split-row"><span>PayMode:</span><span>' + payMode + '</span></div><div class="split-row"><span>Txn Id:</span><span>' + txnId + '</span></div><div class="standard-row">Attendant:</div><div class="split-row"><span>TxSt:</span><span>' + ddMMyy + ' ' + txSt + '</span></div><div class="split-row"><span>TxEnd:</span><span>' + ddMMyy + ' ' + txEnd + '</span></div><div class="split-row"><span>Rate/Ltr.:</span><span>' + unitPrice + '</span></div><div class="split-row"><span>Volume(Ltr.):</span><span>' + volume + '</span></div><div class="split-row"><span>Amount(Rs.):</span><span>' + amount + '</span></div>' + presetHtml + '<div class="standard-row">VechNo:</div><div class="standard-row">MobileNo:</div>' + footer;
+            html = '<div class="text-center-wrap mb-5"><img src="' + logo + '" class="logo mb-5" alt="BP Logo">' + address + '</div>' +
+                   '<div class="split-row"><span>Date:</span><span>' + ddMMyyyy + '</span></div>' +
+                   '<div class="split-row"><span>Time:</span><span>' + timeStr + '</span></div>' +
+                   '<div class="split-row"><span>BayNo:</span><span>' + bayNo + '</span></div>' +
+                   '<div class="split-row"><span>NozzleNo:</span><span>' + nozzle + '</span></div>' +
+                   '<div class="split-row"><span>Product:</span><span>' + product + '</span></div>' +
+                   '<div class="split-row"><span>PayMode:</span><span>' + payMode + '</span></div>' +
+                   '<div class="split-row"><span>Txn Id:</span><span>' + txnId + '</span></div>' +
+                   '<div class="standard-row">Attendant:</div>' +
+                   '<div class="split-row"><span>TxSt:</span><span>' + ddMMyy + ' ' + txSt + '</span></div>' +
+                   '<div class="split-row"><span>TxEnd:</span><span>' + ddMMyy + ' ' + txEnd + '</span></div>' +
+                   '<div class="split-row"><span>Rate/Ltr.:</span><span>' + unitPrice + '</span></div>' +
+                   '<div class="split-row"><span>Volume(Ltr.):</span><span>' + volume + '</span></div>' +
+                   '<div class="split-row"><span>Amount(Rs.):</span><span>' + amount + '</span></div>' +
+                   presetHtml +
+                   '<div class="standard-row">VechNo:</div>' +
+                   '<div class="standard-row">MobileNo:</div>' + footer;
         }
         else if (entity === 'hpshirdhon') {
             containerElem.className = 'style-hp';
@@ -315,23 +340,26 @@
         containerElem.innerHTML = html;
     }
 
-    // --- High-Resolution Image Export for Printer App ---
     function convertToImage() {
         var receiptContainer = document.getElementById('receipt-container');
         var previewBox = document.getElementById('preview-box');
         if (!receiptContainer) return;
         
+        var originalBorder = receiptContainer.style.border;
+        receiptContainer.style.border = 'none';
+
         if (typeof html2canvas === 'undefined') {
             alert("Image generator is still loading. Please wait a second and try again.");
+            receiptContainer.style.border = originalBorder;
             return;
         }
 
-        // Scale 2 captures a high-res image, which the printer app safely scales down natively to 384 dots.
         html2canvas(receiptContainer, {
             scale: 2, 
             backgroundColor: "#ffffff",
             useCORS: true
         }).then(function(canvas) {
+            receiptContainer.style.border = originalBorder;
             var imgData = canvas.toDataURL("image/png");
             
             var imgElement = document.getElementById('receipt-image');
@@ -340,11 +368,7 @@
             if (imgElement) {
                 imgElement.src = imgData;
                 imgElement.style.display = 'block';
-                // Lock the displayed image on screen so it looks identical natively
-                imgElement.style.width = '100%'; 
-                imgElement.style.maxWidth = '384px'; 
             }
-            // Hide the live HTML wrapper and show the captured image
             if (previewBox) previewBox.style.display = 'none';
             if (instructionElement) {
                 instructionElement.innerHTML = '↑ Long-press the receipt above to Save to Photos or Share.';
@@ -353,6 +377,7 @@
             
         }).catch(function(err) {
             console.error("Error generating image: ", err);
+            receiptContainer.style.border = originalBorder;
             alert("Could not generate image. Please take a manual screenshot.");
         });
     }
