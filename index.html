@@ -26,7 +26,7 @@
         
         #preview-panel { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); display: flex; flex-direction: column; align-items: center; }
         
-        /* Receipt Styles - Widened to 250px to prevent wrapping */
+        /* Receipt Styles - Container explicitly widened further for Vijay Automobile specifically via JS */
         #receipt-container { width: 250px; background: white; color: black; font-family: 'Courier New', Courier, monospace; padding: 10px; box-sizing: border-box; margin: 0 auto; border: 1px solid #ccc; }
         #receipt-image { display: none; max-width: 100%; margin: 0 auto; border: 1px solid #ccc; }
         #image-instruction { display: none; text-align: center; color: #d9534f; font-weight: bold; margin-top: 15px; font-size: 14px; }
@@ -37,17 +37,16 @@
         
         .logo { max-width: 165px; filter: grayscale(100%) contrast(1.2); margin: 0 auto; display: block; }
         
-        /* Adjusted partner logo margins and sizing - Pine Labs significantly larger and pulled up */
-        .fiserv-logo { max-width: 130px; filter: grayscale(100%) contrast(1.2); margin: -10px auto 0; display: block; }
-        /* Removed massive negative margin, added small positive margin to clear text */
+        .fiserv-logo { max-width: 160px; filter: grayscale(100%) contrast(1.2); margin: -5px auto 0; display: block; }
         .pinelabs-logo { max-width: 250px; width: 100%; filter: grayscale(100%) contrast(1.2); margin: 10px auto 0; display: block; }
         
+        /* Consistent font sizing */
         .text-10 { font-size: 10px; }
         .text-11 { font-size: 11px; }
         .text-12 { font-size: 12px; }
         
-        /* Condensed class for highly packed lines */
-        .condensed-row { font-size: 9px; letter-spacing: -0.5px; white-space: nowrap; }
+        /* Explicitly force single line on constrained rows without shrinking font size */
+        .nowrap-row { white-space: nowrap; display: flex; justify-content: space-between; width: 100%; }
         
         .nowrap { white-space: nowrap; }
         .mb-5 { margin-bottom: 5px; }
@@ -87,7 +86,7 @@
         </div>
         <div class="form-group">
             <label>Unit Price (Rate)</label>
-            <input type="number" id="unitPrice" value="90.33" step="0.01" oninput="generateReceipt()">
+            <input type="number" id="unitPrice" value="98.02" step="0.01" oninput="generateReceipt()">
         </div>
         <div class="form-group">
             <label>Product</label>
@@ -99,7 +98,7 @@
         <div class="form-group">
             <label>Transaction Type</label>
             <select id="txnType" onchange="generateReceipt()">
-                <option value="CREDIT CARD">Card</option>
+                <option value="CARD">Card</option>
                 <option value="CASH">Cash</option>
             </select>
         </div>
@@ -201,6 +200,13 @@
         var timeObj = generateRandomTime();
         var timeStr = timeObj.str;
         var html = '';
+        
+        // Dynamically adjust container width to ensure Vijay Automobile text never wraps
+        if (entity === 'vijay') {
+            containerElem.style.width = '265px';
+        } else {
+            containerElem.style.width = '250px';
+        }
 
         if (entity === 'vijay') {
             var pump = Math.floor(Math.random() * 20) + 1;
@@ -212,11 +218,11 @@
             if (partner === 'fiserv') {
                 footerHtml = '<div class="center mt-5" style="line-height: 1.1;">Choose e-receipts to save paper and protect the environment!<br><br>CUSTOMER COPY<br>1.08.29_20251212<br>BillerApp_1.0.06<img src="fiserv.png" class="fiserv-logo" alt="Fiserv Logo"></div>';
             } else {
-                // Fixed the missing text by adding it back above the Pine Labs image
-                footerHtml = '<div class="center mt-5" style="line-height: 1.1;">Choose e-receipts to save paper and protect the environment!<br><br>CUSTOMER COPY<br>BillerApp_1.1.4<br><img src="pinelabs.png" class="pinelabs-logo" alt="Pine Labs Logo"></div>';
+                footerHtml = '<div class="center mt-5" style="line-height: 1.1;">Choose e-receipts to save paper and protect the environment!<br><br>CUSTOMER COPY<br>BillerApp_1.1.4<img src="pinelabs.png" class="pinelabs-logo" alt="Pine Labs Logo"></div>';
             }
 
-            html = '<div class="text-10"><img src="LogoHP.png" class="logo mb-5" alt="HP Logo"><div class="center bold">VIJAY AUTOMOBILES<br>MUMBAI PANVEL ROAD KALAMBOLI<br>NAVI MUMBAI</div><br><div class="nowrap">Attendant Name : Vijay Automobile P</div><div class="flex-row"><span>DATE: ' + ddMMyyyy + '</span><span>TIME: ' + timeStr + '</span></div><div class="flex-row mb-5 condensed-row"><span>MID: 470000050641539</span><span>TID: 39268123</span></div><div class="center bold text-12 mb-5">Sale</div><div class="flex-row"><span>Txn Type: ' + payMode + '</span></div><div class="flex-row"><span>Product :</span><span>' + product + '</span></div><div class="flex-row"><span>Txn Id :</span><span>' + txnId + '</span></div><div class="flex-row condensed-row"><span>Unit Price : ₹ ' + unitPrice + '</span><span>Quantity : ' + volume + ' Ltr</span></div><div class="flex-row condensed-row mb-5"><span>Pump No : ' + pump + '</span><span>Nozzle No : ' + nozzle + '</span></div><div class="flex-row"><span>Total Sale</span><span>₹ ' + amount + '</span></div><div style="border-top: 1px dashed black; margin: 5px 0;"></div><div class="flex-row bold text-12 mb-5"><span>Net Amount</span><span>₹ ' + amount + '</span></div><div style="border-top: 1px dashed black; margin: 5px 0;"></div>' + footerHtml + '</div>';
+            // Applied nowrap-row to explicitly force layout integrity without shrinking font size
+            html = '<div class="text-10"><img src="LogoHP.png" class="logo mb-5" alt="HP Logo"><div class="center bold">VIJAY AUTOMOBILES<br>MUMBAI PANVEL ROAD KALAMBOLI<br>NAVI MUMBAI</div><br><div class="nowrap">Attendant Name : Vijay Automobile P</div><div class="nowrap-row"><span>DATE: ' + ddMMyyyy + '</span><span>TIME: ' + timeStr + '</span></div><div class="nowrap-row mb-5"><span>MID: 470000050641539</span><span>TID: 39268123</span></div><div class="center bold text-12 mb-5">Sale</div><div class="nowrap-row"><span>Txn Type: ' + payMode + '</span></div><div class="nowrap-row"><span>Product :</span><span>' + product + '</span></div><div class="nowrap-row"><span>Txn Id :</span><span>' + txnId + '</span></div><div class="nowrap-row"><span>Unit Price : ₹ ' + unitPrice + '</span><span>Qty : ' + volume + ' Ltr</span></div><div class="nowrap-row mb-5"><span>Pump No : ' + pump + '</span><span>Nozzle No : ' + nozzle + '</span></div><div class="nowrap-row"><span>Total Sale</span><span>₹ ' + amount + '</span></div><div style="border-top: 1px dashed black; margin: 5px 0;"></div><div class="nowrap-row bold text-12 mb-5"><span>Net Amount</span><span>₹ ' + amount + '</span></div><div style="border-top: 1px dashed black; margin: 5px 0;"></div>' + footerHtml + '</div>';
         } 
         else if (entity === 'bppl' || entity === 'bpeway' || entity === 'bpkalamboli') {
             var logo = 'LogoBPPL.png';
@@ -251,14 +257,14 @@
 
             var presetHtml = showPreset ? '<div class="flex-row"><span>PresetType:</span><span>Local Volume</span></div><div class="flex-row"><span>Preset Value:</span><span>99.99</span></div>' : '';
 
-            html = '<div class="text-12"><img src="' + logo + '" class="logo mb-5" alt="BP Logo"><div class="center">' + address + '</div><div class="flex-row"><span>Date:</span><span>' + ddMMyyyy + '</span></div><div class="flex-row"><span>Time:</span><span>' + timeStr + '</span></div><div class="flex-row"><span>BayNo:</span><span>' + bayNo + '</span></div><div class="flex-row"><span>NozzleNo:</span><span>' + nozzle + '</span></div><div class="flex-row"><span>Product:</span><span>' + product + '</span></div><div class="flex-row"><span>PayMode:</span><span>' + payMode + '</span></div><div class="flex-row"><span>Txn Id:</span><span>' + txnId + '</span></div><div>Attendant:</div><div class="flex-row"><span>TxSt:</span><span>' + ddMMyy + ' ' + txSt + '</span></div><div class="flex-row"><span>TxEnd:</span><span>' + ddMMyy + ' ' + txEnd + '</span></div><div class="flex-row condensed-row"><span>Rate/Ltr.:</span><span>' + unitPrice + '</span></div><div class="flex-row condensed-row"><span>Volume(Ltr.):</span><span>' + volume + '</span></div><div class="flex-row condensed-row"><span>Amount(Rs.):</span><span>' + amount + '</span></div>' + presetHtml + '<div>VechNo:</div><div>MobileNo:</div>' + footer + '</div>';
+            html = '<div class="text-12"><img src="' + logo + '" class="logo mb-5" alt="BP Logo"><div class="center">' + address + '</div><div class="flex-row"><span>Date:</span><span>' + ddMMyyyy + '</span></div><div class="flex-row"><span>Time:</span><span>' + timeStr + '</span></div><div class="flex-row"><span>BayNo:</span><span>' + bayNo + '</span></div><div class="flex-row"><span>NozzleNo:</span><span>' + nozzle + '</span></div><div class="flex-row"><span>Product:</span><span>' + product + '</span></div><div class="flex-row"><span>PayMode:</span><span>' + payMode + '</span></div><div class="flex-row"><span>Txn Id:</span><span>' + txnId + '</span></div><div>Attendant:</div><div class="flex-row"><span>TxSt:</span><span>' + ddMMyy + ' ' + txSt + '</span></div><div class="flex-row"><span>TxEnd:</span><span>' + ddMMyy + ' ' + txEnd + '</span></div><div class="flex-row nowrap-row"><span>Rate/Ltr.:</span><span>' + unitPrice + '</span></div><div class="flex-row nowrap-row"><span>Volume(Ltr.):</span><span>' + volume + '</span></div><div class="flex-row nowrap-row"><span>Amount(Rs.):</span><span>' + amount + '</span></div>' + presetHtml + '<div>VechNo:</div><div>MobileNo:</div>' + footer + '</div>';
         }
         else if (entity === 'hpshirdhon') {
             var hpDate = formatHPDate(dateInput);
             var invoiceNo = Math.floor(10000 + Math.random() * 90000);
             var productTitleCase = product.charAt(0).toUpperCase() + product.slice(1).toLowerCase();
             
-            html = '<div class="text-11"><img src="LogoHP.png" class="logo mb-5" alt="HP Logo"><div class="center mb-5">SHRI GANESH HIGHWAY SERV<br>SHIRDHON, NH-66, PANVEL,<br>RAIGAD, MAHARASHTRA.<br>9867503325/8806580294<br>VAT NO-27800771919V<br>...<br>ORIGINAL</div><div class="center mb-5">************************</div><div class="flex-row mb-5"><span>' + hpDate + '</span><span>' + timeStr + '</span></div><div>TXN NO: ' + txnId + '</div><div>INVOICE NO: ' + invoiceNo + '</div><div>VEHICLE NO: NOT ENTERED</div><div>PRESET: NOT ENTERED</div><div class="center mb-5 mt-5">************************</div><div class="condensed-row">NOZZLE NO : ' + nozzle + '</div><div class="condensed-row">PRODUCT: ' + productTitleCase + '</div><div class="condensed-row">RATE &nbsp;&nbsp;&nbsp;: ' + unitPrice + ' INR/Ltr</div><div class="condensed-row">VOLUME: ' + volume + ' Ltr</div><div class="condensed-row">AMOUNT: ' + amount + ' INR</div><div class="center mb-5 mt-5">************************</div><div class="center mt-5">Thank You! Visit Again</div></div>';
+            html = '<div class="text-11"><img src="LogoHP.png" class="logo mb-5" alt="HP Logo"><div class="center mb-5">SHRI GANESH HIGHWAY SERV<br>SHIRDHON, NH-66, PANVEL,<br>RAIGAD, MAHARASHTRA.<br>9867503325/8806580294<br>VAT NO-27800771919V<br>...<br>ORIGINAL</div><div class="center mb-5">************************</div><div class="flex-row mb-5"><span>' + hpDate + '</span><span>' + timeStr + '</span></div><div>TXN NO: ' + txnId + '</div><div>INVOICE NO: ' + invoiceNo + '</div><div>VEHICLE NO: NOT ENTERED</div><div>PRESET: NOT ENTERED</div><div class="center mb-5 mt-5">************************</div><div class="nowrap-row">NOZZLE NO : ' + nozzle + '</div><div class="nowrap-row">PRODUCT: ' + productTitleCase + '</div><div class="nowrap-row">RATE &nbsp;&nbsp;&nbsp;: ' + unitPrice + ' INR/Ltr</div><div class="nowrap-row">VOLUME: ' + volume + ' Ltr</div><div class="nowrap-row">AMOUNT: ' + amount + ' INR</div><div class="center mb-5 mt-5">************************</div><div class="center mt-5">Thank You! Visit Again</div></div>';
         }
 
         if (containerElem) containerElem.innerHTML = html;
