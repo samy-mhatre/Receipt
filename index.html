@@ -26,37 +26,40 @@
         
         #preview-panel { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); display: flex; flex-direction: column; align-items: center; }
         
-        /* Base Receipt Container */
+        /* Base Receipt Container - Removed global color and font-weight so entities can override */
         #receipt-container { 
-            background: white; color: #000000; 
+            background: white;
             padding: 15px; box-sizing: border-box; margin: 0 auto; border: 1px solid #ccc; 
         }
         
         /* --- ENTITY SPECIFIC STYLES TO MAKE THEM UNIQUE --- */
         
-        /* Vijay: Standard Courier, Thick Weight, 395px width */
+        /* Vijay: Slightly older/faded printer look (Lighter grey-black, medium weight) */
         .style-vijay {
             width: 395px;
             font-family: 'Courier New', Courier, monospace;
-            font-weight: 700;
+            font-weight: 600;
+            color: #2b2b2b;
             font-size: 15px;
         }
         .style-vijay .text-12 { font-size: 17px; }
         
-        /* BP: Lucida Console, Very Heavy Weight, 350px width (Prints visually LARGER because narrower width scales up to 58mm) */
+        /* BP: Fresh, heavily inked printer (Pure deep black, extra bold) */
         .style-bp {
             width: 350px;
             font-family: 'Lucida Console', Monaco, monospace;
             font-weight: 800;
+            color: #000000;
             font-size: 13.5px;
         }
         .style-bp .text-12 { font-size: 15px; }
         
-        /* HP: Consolas, Extra Bold, 375px width */
+        /* HP: Standard crisp printer (Medium black, bold weight) */
         .style-hp {
             width: 375px;
             font-family: Consolas, 'Courier New', monospace;
-            font-weight: 900;
+            font-weight: 700;
+            color: #111111;
             font-size: 14.5px;
         }
         .style-hp .text-11 { font-size: 15px; }
@@ -220,7 +223,6 @@
         var timeStr = timeObj.str;
         var html = '';
         
-        // Apply distinct CSS styling based on entity selection
         if (entity === 'vijay') {
             containerElem.className = 'style-vijay';
             
@@ -275,7 +277,7 @@
 
             var presetHtml = showPreset ? '<div class="flex-row"><span>PresetType:</span><span>Local Volume</span></div><div class="flex-row"><span>Preset Value:</span><span>99.99</span></div>' : '';
 
-            html = '<div class="text-12"><img src="' + logo + '" class="logo mb-5" alt="BP Logo"><div class="center">' + address + '</div><div class="flex-row"><span>Date:</span><span>' + ddMMyyyy + '</span></div><div class="flex-row"><span>Time:</span><span>' + timeStr + '</span></div><div class="flex-row"><span>BayNo:</span><span>' + bayNo + '</span></div><div class="flex-row"><span>NozzleNo:</span><span>' + nozzle + '</span></div><div class="flex-row"><span>Product:</span><span>' + product + '</span></div><div class="flex-row"><span>PayMode:</span><span>' + payMode + '</span></div><div class="flex-row"><span>Txn Id:</span><span>' + txnId + '</span></div><div>Attendant:</div><div class="flex-row"><span>TxSt:</span><span>' + ddMMyy + ' ' + txSt + '</span></div><div class="flex-row"><span>TxEnd:</span><span>' + ddMMyy + ' ' + txEnd + '</span></div><div class="flex-row nowrap-row"><span>Rate/Ltr.:</span><span>' + unitPrice + '</span></div><div class="flex-row nowrap-row"><span>Volume(Ltr.):</span><span>' + volume + '</span></div><div class="flex-row nowrap-row"><span>Amount(Rs.):</span><span>' + amount + '</span></div>' + presetHtml + '<div>VechNo:</div><div>MobileNo:</div>' + footer + '</div>';
+            html = '<div class="text-12"><img src="' + logo + '" class="logo mb-5" alt="BP Logo"><div class="center">' + address + '</div><div class="flex-row"><span>Date:</span><span>' + ddMMyyyy + '</span></div><div class="flex-row"><span>Time:</span><span>' + timeStr + '</span></div><div class="flex-row"><span>BayNo:</span><span>' + bayNo + '</span></div><div class="flex-row"><span>NozzleNo:</span><span>' + nozzle + '</span></div><div class="flex-row"><span>Product:</span><span>' + product + '</span></div><div class="flex-row"><span>PayMode:</span><span>' + payMode + '</span></div><div class="flex-row"><span>Txn Id:</span><span>' + txnId + '</span></div><div>Attendant:</div><div class="flex-row"><span>TxSt:</span><span>' + ddMMyy + ' ' + txSt + '</span></div><div class="flex-row nowrap-row"><span>Rate/Ltr.:</span><span>' + unitPrice + '</span></div><div class="flex-row nowrap-row"><span>Volume(Ltr.):</span><span>' + volume + '</span></div><div class="flex-row nowrap-row"><span>Amount(Rs.):</span><span>' + amount + '</span></div>' + presetHtml + '<div>VechNo:</div><div>MobileNo:</div>' + footer + '</div>';
         }
         else if (entity === 'hpshirdhon') {
             containerElem.className = 'style-hp';
