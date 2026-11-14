@@ -34,7 +34,13 @@
         .center { text-align: center; }
         .bold { font-weight: bold; }
         .flex-row { display: flex; justify-content: space-between; }
+        
         .logo { max-width: 165px; filter: grayscale(100%) contrast(1.2); margin: 0 auto; display: block; }
+        
+        /* Adjusted partner logo margins and sizing - Pine Labs significantly larger and pulled up */
+        .fiserv-logo { max-width: 130px; filter: grayscale(100%) contrast(1.2); margin: -10px auto 0; display: block; }
+        /* Removed massive negative margin, added small positive margin to clear text */
+        .pinelabs-logo { max-width: 250px; width: 100%; filter: grayscale(100%) contrast(1.2); margin: 10px auto 0; display: block; }
         
         .text-10 { font-size: 10px; }
         .text-11 { font-size: 11px; }
@@ -139,9 +145,7 @@
     }
 
     function generateRandomOffsets() {
-        // Start time offset: 4 to 6 minutes (in seconds)
         var stOffsetSeconds = (Math.floor(Math.random() * 3) + 4) * 60 + Math.floor(Math.random() * 60);
-        // End time offset: 1 to 3 minutes (in seconds)
         var endOffsetSeconds = (Math.floor(Math.random() * 3) + 1) * 60 + Math.floor(Math.random() * 60);
         
         return {
@@ -201,7 +205,18 @@
         if (entity === 'vijay') {
             var pump = Math.floor(Math.random() * 20) + 1;
             var ddMMyyyy = formatDateDDMMYYYY(dateInput);
-            html = '<div class="text-10"><img src="LogoHP.png" class="logo mb-5" alt="HP Logo"><div class="center bold">VIJAY AUTOMOBILES<br>MUMBAI PANVEL ROAD KALAMBOLI<br>NAVI MUMBAI</div><br><div class="nowrap">Attendant Name : Vijay Automobile P</div><div class="flex-row"><span>DATE: ' + ddMMyyyy + '</span><span>TIME: ' + timeStr + '</span></div><div class="flex-row mb-5 condensed-row"><span>MID: 470000050641539</span><span>TID: 39268123</span></div><div class="center bold text-12 mb-5">Sale</div><div class="flex-row"><span>Txn Type: ' + payMode + '</span></div><div class="flex-row"><span>Product :</span><span>' + product + '</span></div><div class="flex-row"><span>Txn Id :</span><span>' + txnId + '</span></div><div class="flex-row condensed-row"><span>Unit Price : ₹ ' + unitPrice + '</span><span>Quantity : ' + volume + ' Ltr</span></div><div class="flex-row condensed-row mb-5"><span>Pump No : ' + pump + '</span><span>Nozzle No : ' + nozzle + '</span></div><div class="flex-row"><span>Total Sale</span><span>₹ ' + amount + '</span></div><div style="border-top: 1px dashed black; margin: 5px 0;"></div><div class="flex-row bold text-12 mb-5"><span>Net Amount</span><span>₹ ' + amount + '</span></div><div style="border-top: 1px dashed black; margin: 5px 0;"></div><div class="center mt-5">Choose e-receipt to save paper and protect the environment<br><br>CUSTOMER COPY<br>Biller App: 1.0.27</div></div>';
+            
+            var partner = Math.random() < 0.5 ? 'fiserv' : 'pinelabs';
+            var footerHtml = '';
+            
+            if (partner === 'fiserv') {
+                footerHtml = '<div class="center mt-5" style="line-height: 1.1;">Choose e-receipts to save paper and protect the environment!<br><br>CUSTOMER COPY<br>1.08.29_20251212<br>BillerApp_1.0.06<img src="fiserv.png" class="fiserv-logo" alt="Fiserv Logo"></div>';
+            } else {
+                // Fixed the missing text by adding it back above the Pine Labs image
+                footerHtml = '<div class="center mt-5" style="line-height: 1.1;">Choose e-receipts to save paper and protect the environment!<br><br>CUSTOMER COPY<br>BillerApp_1.1.4<br><img src="pinelabs.png" class="pinelabs-logo" alt="Pine Labs Logo"></div>';
+            }
+
+            html = '<div class="text-10"><img src="LogoHP.png" class="logo mb-5" alt="HP Logo"><div class="center bold">VIJAY AUTOMOBILES<br>MUMBAI PANVEL ROAD KALAMBOLI<br>NAVI MUMBAI</div><br><div class="nowrap">Attendant Name : Vijay Automobile P</div><div class="flex-row"><span>DATE: ' + ddMMyyyy + '</span><span>TIME: ' + timeStr + '</span></div><div class="flex-row mb-5 condensed-row"><span>MID: 470000050641539</span><span>TID: 39268123</span></div><div class="center bold text-12 mb-5">Sale</div><div class="flex-row"><span>Txn Type: ' + payMode + '</span></div><div class="flex-row"><span>Product :</span><span>' + product + '</span></div><div class="flex-row"><span>Txn Id :</span><span>' + txnId + '</span></div><div class="flex-row condensed-row"><span>Unit Price : ₹ ' + unitPrice + '</span><span>Quantity : ' + volume + ' Ltr</span></div><div class="flex-row condensed-row mb-5"><span>Pump No : ' + pump + '</span><span>Nozzle No : ' + nozzle + '</span></div><div class="flex-row"><span>Total Sale</span><span>₹ ' + amount + '</span></div><div style="border-top: 1px dashed black; margin: 5px 0;"></div><div class="flex-row bold text-12 mb-5"><span>Net Amount</span><span>₹ ' + amount + '</span></div><div style="border-top: 1px dashed black; margin: 5px 0;"></div>' + footerHtml + '</div>';
         } 
         else if (entity === 'bppl' || entity === 'bpeway' || entity === 'bpkalamboli') {
             var logo = 'LogoBPPL.png';
