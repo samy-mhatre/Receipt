@@ -106,7 +106,7 @@
             <label>Date</label>
             <input type="date" id="dateInput" onchange="generateReceipt()">
         </div>
-        <button type="button" class="btn-print" onclick="convertToImage()">Generate Image to Save</button>
+        <button type="button" class="btn-print" onclick="convertToImage()">Generate PDF to Print</button>
     </div>
 
     <div id="preview-panel">
@@ -269,7 +269,7 @@
         if (containerElem) containerElem.innerHTML = html;
     }
 
-    // --- IMAGE CONVERSION LOGIC ---
+    // --- IMAGE & PDF CONVERSION LOGIC ---
     function convertToImage() {
         var receiptContainer = document.getElementById('receipt-container');
         if (!receiptContainer) return;
@@ -277,20 +277,36 @@
         var originalBorder = receiptContainer.style.border;
         receiptContainer.style.border = 'none';
 
-        if (typeof html2canvas === 'undefined') {
-            alert("Image generator is still loading. Please wait a second and try again.");
+        if (typeof html2canvas === 'undefined' || typeof window.jspdf === 'undefined') {
+            alert("Generators are still loading. Please wait a second and try again.");
             receiptContainer.style.border = originalBorder;
             return;
         }
 
         html2canvas(receiptContainer, {
-            scale: 3, 
+            scale: 3, // High resolution for print
             backgroundColor: "#ffffff",
             useCORS: true
         }).then(function(canvas) {
             receiptContainer.style.border = originalBorder;
             var imgData = canvas.toDataURL("image/png");
             
+            // --- Generate and Download PDF ---
+            const { jsPDF } = window.jspdf;
+            // 58mm is the standard width for thermal printers. 
+            // We scale the height proportionally based on the canvas aspect ratio.
+            var pdfWidth = 58; 
+            var pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+            var doc = new jsPDF('p', 'mm', [pdfWidth, pdfHeight]);
+            
+            // Add image to PDF taking up the exact dimensions of the page
+            doc.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+            
+            // Automatically prompt the user to download the PDF
+            var fileName = "Receipt_" + Date.now() + ".pdf";
+            doc.save(fileName);
+            
+            // --- Display backup image on screen ---
             var imgElement = document.getElementById('receipt-image');
             var instructionElement = document.getElementById('image-instruction');
             
@@ -299,15 +315,20 @@
                 imgElement.style.display = 'block';
             }
             if (receiptContainer) receiptContainer.style.display = 'none';
-            if (instructionElement) instructionElement.style.display = 'block';
+            if (instructionElement) {
+                instructionElement.innerHTML = '✅ PDF downloaded to Safari Downloads!<br><span style="font-weight:normal; font-size: 12px; color: #666;">↑ You can also long-press the image above to save as a photo.</span>';
+                instructionElement.style.display = 'block';
+            }
             
         }).catch(function(err) {
-            console.error("Error generating image: ", err);
+            console.error("Error generating image/PDF: ", err);
             receiptContainer.style.border = originalBorder;
-            alert("Could not generate image. Please take a manual screenshot.");
+            alert("Could not generate file. Please take a manual screenshot.");
         });
     }
 </script>
+<!-- Required libraries for Canvas and PDF generation -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </body>
 </html>
